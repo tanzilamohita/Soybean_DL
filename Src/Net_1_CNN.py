@@ -2,7 +2,7 @@
 # Tanzila Islam
 # PhD Student, Iwate University
 # Email: tanzilamohita@gmail.com
-# Created Date: 12/24/2021
+# Created Date: 1/3/2022
 # ===============================
 # main modules needed
 import pandas as pd
@@ -42,7 +42,7 @@ Y = Y.dropna()
 Y.columns = np.arange(0, len(Y.columns))
 print("Y shape", Y.shape)
 
-X = pd.read_csv('../Data_Prediction/Soybean_X_C3.csv', index_col=0,
+X = pd.read_csv('../Data_Prediction/Soybean_X_C1.csv', index_col=0,
                 low_memory=False)
 chunk_num = 0
 chunk_loss = []
@@ -65,7 +65,7 @@ index = 0  # first trait analyzed
 corr_df = []
 # print(Y[itrait])
 # Y.shape[1]
-for i in range(1, 2):
+for i in range(0, 3):
     print(Y[i])
     print(i)
     X_train, X_valid, y_train, y_valid = train_test_split(X, Y[i], test_size=0.2)
@@ -73,7 +73,7 @@ for i in range(1, 2):
     print("X_valid shape, y_valid shape", X_valid.shape, y_valid.shape)
 
     batch_size = 128
-    epochs = 40
+    epochs = 100
     nSNP = X_train.shape[1]
     print("SNP", nSNP)
     nStride = 2  # stride between convolutions
@@ -112,8 +112,8 @@ for i in range(1, 2):
     # # list some properties
     model_cnn.summary()
 
-    plot_model(model_cnn, to_file='../ModelMetaData_Prediction/Net_3_CNN/'
-                            'Net_3_CNN_Flowgraph/Net_3_CNN_FlowgraphTrait_{}'.format(i)
+    plot_model(model_cnn, to_file='../ModelMetaData_Prediction/Net_1_CNN/'
+                            'Net_1_CNN_Flowgraph/Net_1_CNN_FlowgraphTrait_{}'.format(i)
                 + '.png',
                show_shapes=True, show_layer_names=True)
 
@@ -128,27 +128,15 @@ for i in range(1, 2):
     loss = model_cnn_train.history['loss']
     val_loss = model_cnn_train.history['val_loss']
 
-    # chunk_loss.append([chunk_num, i, loss])
-    # chunk_val_loss.append([chunk_num, i, val_loss])
-
-    # np.savetxt('../ModelMetaData_Prediction/Net_3_CNN/Net_3_CNN_Chunk_Result/'
-    #            'Net_3_CNN_Chunk_Loss/Net_3_CNN_Chunk_loss_Trait_{}'.format(i)
-    #            + '_chunk_num_{}'.format(chunk_num) + '.csv',
-    #            loss, delimiter=',', comments='')
-    # np.savetxt('../ModelMetaData_Prediction/Net_3_CNN/Net_3_CNN_Chunk_Result/'
-    #            'Net_3_CNN_Chunk_Loss/Net_3_CNN_Chunk_val_loss_Trait_{}'.format(i)
-    #            + '_chunk_num_{}'.format(chunk_num) + '.csv',
-    #            val_loss, delimiter=',', comments='')
-
     plt.plot(loss, label='Training loss')
     plt.plot(val_loss, label='Validation loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'valid'], loc='upper left')
     plt.title('Training and validation loss')
-    plt.savefig('../ModelMetaData_Prediction/Net_3_CNN/Net_3_CNN_Loss/'
-                'Net_3_CNN_Loss_Trait_{}'.format(i) + '.png')
-    plt.show()
+    plt.savefig('../ModelMetaData_Prediction/Net_1_CNN/Net_1_CNN_Loss/'
+                'Net_1_CNN_Loss_Trait_{}'.format(i) + '.png')
+    # plt.show()
     plt.clf()
 
     # cross-validation
@@ -158,18 +146,6 @@ for i in range(1, 2):
     # get predicted target values
     y_hat = model_cnn.predict(X2_valid, batch_size=batch_size)
     np.seterr(divide='ignore', invalid='ignore')
-
-    # chunk_y_valid.append([chunk_num, i, y_valid])
-    # chunk_y_hat.append([chunk_num, i, y_hat])
-
-    # np.savetxt('../ModelMetaData_Prediction/Net_3_CNN/Net_3_CNN_Chunk_Result/'
-    #            'Net_3_CNN_Chunk_Prediction/Net_3_CNN_Chunk_Y_hat_Trait_{}'.format(i)
-    #             + '_chunk_num_{}'.format(chunk_num) + '.csv',
-    #            y_hat, delimiter=',', comments='')
-    # np.savetxt('../ModelMetaData_Prediction/Net_3_CNN/Net_3_CNN_Chunk_Result/'
-    #            'Net_3_CNN_Chunk_Prediction/Net_3_CNN_Chunk_Y_valid_Trait_{}'.format(i)
-    #             + '_chunk_num_{}'.format(chunk_num) + '.csv',
-    #            y_valid, delimiter=',', comments='')
 
     # correlation btw predicted and observed
     corr = np.corrcoef(y_valid, y_hat[:, 0])[0, 1]
@@ -191,9 +167,9 @@ for i in range(1, 2):
 
     # add linear regression line to scatterplot
     plt.plot(y_valid, m * y_valid + b)
-    plt.savefig('../ModelMetaData_Prediction/Net_3_CNN/Net_3_CNN_Prediction/'
-                'Net_3_CNN_Prediction_Trait_{}'.format(i) + '.png')
-    plt.show()
+    plt.savefig('../ModelMetaData_Prediction/Net_1_CNN/Net_1_CNN_Prediction/'
+                'Net_1_CNN_Prediction_Trait_{}'.format(i) + '.png')
+    # plt.show()
     plt.clf()
     # print(df)
     corr_df.append([i, corr])
@@ -201,14 +177,15 @@ for i in range(1, 2):
 
 
 
-np.savetxt('../ModelMetaData_Prediction/Net_3_CNN/Net_3_CNN_Result/'
-           'Net_3_CNN_cor.csv',
+np.savetxt('../ModelMetaData_Prediction/Net_1_CNN/Net_1_CNN_Result/'
+           'Net_1_CNN_cor.csv',
            np.column_stack(corr_df), delimiter=',', comments='', fmt='%s')
 
-pathlib.Path("../ModelMetaData_Prediction/Net_3_CNN/Net_3_CNN_Time/"
-             "Net_3_CNN_Training_Time.txt"). \
+pathlib.Path("../ModelMetaData_Prediction/Net_1_CNN/Net_1_CNN_Time/"
+             "Net_1_CNN_Training_Time.txt"). \
     write_text("Training Time for Raw: {}"
                .format(time.time() - start_time))
+
 print('Total Training Time: ', time.time() - start_time)
 
 

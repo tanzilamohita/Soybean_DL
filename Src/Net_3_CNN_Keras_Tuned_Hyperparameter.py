@@ -73,10 +73,10 @@ for i in range(0, 1):
     print("X_valid shape, y_valid shape", X_valid.shape, y_valid.shape)
 
     batch_size = 128
-    epochs = 39
+    epochs = 100
     nSNP = X_train.shape[1]
     print("SNP", nSNP)
-    nStride = 2  # stride between convolutions
+    nStride = 3  # stride between convolutions
 
     X2_train = np.expand_dims(X_train, axis=2)
     X2_valid = np.expand_dims(X_valid, axis=2)
@@ -86,32 +86,34 @@ for i in range(0, 1):
     # Instantiate
     model_cnn = Sequential()
     # add convolutional layer
-    model_cnn.add(Conv1D(224, 2, activation="relu", input_shape=(nSNP, 1)))
+    model_cnn.add(Conv1D(96, nStride, activation="relu", input_shape=(nSNP, 1)))
     # add pooling layer: takes maximum of two consecutive values
+    model_cnn.add(LeakyReLU(alpha=0.1))
+    model_cnn.add(Dropout(0.5))
     model_cnn.add(MaxPooling1D(pool_size=2))
 
     # # add convolutional layer
-    model_cnn.add(Conv1D(224, 2, activation='relu'))
+    model_cnn.add(Conv1D(192, nStride, activation='relu'))
     # # add pooling layer: takes maximum of two consecutive values
     model_cnn.add(MaxPooling1D(pool_size=2))
     # # add convolutional layer
-    model_cnn.add(Conv1D(256, 2, activation='relu'))
+    model_cnn.add(Conv1D(32, nStride, activation='relu'))
     # # add pooling layer: takes maximum of two consecutive values
     model_cnn.add(MaxPooling1D(pool_size=2))
 
-    model_cnn.add(Conv1D(224, 2, activation='relu'))
+    model_cnn.add(Conv1D(32, nStride, activation='relu'))
     # # add pooling layer: takes maximum of two consecutive values
     model_cnn.add(MaxPooling1D(pool_size=2))
-
-    model_cnn.add(Conv1D(128, 2, activation='relu'))
-    # # add pooling layer: takes maximum of two consecutive values
-    model_cnn.add(MaxPooling1D(pool_size=2))
+    #
+    # model_cnn.add(Conv1D(128, nStride, activation='relu'))
+    # # # add pooling layer: takes maximum of two consecutive values
+    # model_cnn.add(MaxPooling1D(pool_size=2))
 
     # Solutions above are linearized to accommodate a standard layer
     model_cnn.add(Flatten())
     model_cnn.add(Dense(10, activation='linear'))
-    # model_cnn.add(LeakyReLU(alpha=0.1))
-    # model_cnn.add(Dense(10))
+    model_cnn.add(LeakyReLU(alpha=0.1))
+    model_cnn.add(Dense(1))
 
     adm = keras.optimizers.Adam(learning_rate=0.0001)
     # Model Compiling (https://keras.io/models/sequential/)
@@ -125,7 +127,7 @@ for i in range(0, 1):
     #             + '_chunk_num_{}'.format(chunk_num) + '.png',
     #            show_shapes=True, show_layer_names=True)
 
-    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=10)
+    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=50)
     # # training
     model_cnn_train = model_cnn.fit(X2_train, y_train, epochs=epochs,
                                     batch_size=batch_size,
@@ -167,10 +169,10 @@ for i in range(0, 1):
     # get predicted target values
     y_hat = model_cnn.predict(X2_valid, batch_size=batch_size)
     np.seterr(divide='ignore', invalid='ignore')
-    print(y_hat)
+    # print(y_hat)
     print(y_hat.shape)
 
-    print(y_valid)
+    # print(y_valid)
     print(y_valid.shape)
     # chunk_y_valid.append([chunk_num, i, y_valid])
     # chunk_y_hat.append([chunk_num, i, y_hat])

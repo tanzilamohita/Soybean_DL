@@ -2,9 +2,8 @@
 # Tanzila Islam
 # PhD Student, Iwate University
 # Email: tanzilamohita@gmail.com
-# Created Date: 1/14/2022
+# Created Date: 1/17/2022
 # ===============================
-
 # main modules needed
 from numpy.random import seed
 # seed(1)
@@ -99,7 +98,7 @@ trait_loss = []
 trait_corr = []
 for itrait in range(0, 3):
     # load Processed Data
-    chunk_filelist = natsorted(glob.glob("../Data_Prediction/Compress_3_Chunk/" + "*.csv"))
+    chunk_filelist = natsorted(glob.glob("../Data_Prediction/Compress_1_Chunk/" + "*.csv"))
     # chunk_filelist = chunk_filelist[0:1]
     # [0:1] -> It will run 1st csv file;
     # If you want to run 10000 files at a time, set [0:10000]
@@ -123,7 +122,7 @@ for itrait in range(0, 3):
         print("X_valid shape, y_valid shape", X_valid.shape, y_valid.shape)
 
         batch_size = 64
-        epochs = 100
+        epochs = 40
         nSNP = X_train.shape[1]
         print("SNP", nSNP)
 
@@ -134,8 +133,8 @@ for itrait in range(0, 3):
         print("X2_valid shape", X2_valid.shape)
 
         model_cnn = CNN(nSNP)
-        plot_model(model_cnn, to_file='../ModelMetaData_Prediction/Net_3_CNN_Chunk/'
-                    'Net_3_CNN_Chunk_Flowgraph/Net_3_CNN_Chunk_Flowgraph.png',
+        plot_model(model_cnn, to_file='../ModelMetaData_Prediction/Net_1_CNN_Chunk/'
+                    'Net_1_CNN_Chunk_Flowgraph/Net_1_CNN_Chunk_Flowgraph.png',
                    show_shapes=True, show_layer_names=True)
         es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=50)
         # # training
@@ -154,9 +153,9 @@ for itrait in range(0, 3):
         plt.xlabel('epoch')
         plt.legend(['train', 'valid'], loc='upper left')
         plt.title('Training and validation loss')
-        plt.savefig('../ModelMetaData_Prediction/Net_3_CNN_Chunk/'
-                    'Net_3_CNN_Chunk_Loss/'
-                    'Net_3_CNN_Loss_Trait_{}'.format(itrait) +
+        plt.savefig('../ModelMetaData_Prediction/Net_1_CNN_Chunk/'
+                    'Net_1_CNN_Chunk_Loss/'
+                    'Net_1_CNN_Loss_Trait_{}'.format(itrait) +
                     '_chunk_{}'.format(index) + '.png')
         # plt.show()
         plt.clf()
@@ -180,9 +179,9 @@ for itrait in range(0, 3):
 
         # add linear regression line to scatterplot
         plt.plot(y_valid, m * y_valid + b)
-        plt.savefig('../ModelMetaData_Prediction/Net_3_CNN_Chunk/'
-                    'Net_3_CNN_Chunk_Prediction/'
-                    'Net_3_CNN_Prediction_Trait_{}'.format(itrait)
+        plt.savefig('../ModelMetaData_Prediction/Net_1_CNN_Chunk/'
+                    'Net_1_CNN_Chunk_Prediction/'
+                    'Net_1_CNN_Prediction_Trait_{}'.format(itrait)
                     + '_chunk_{}'.format(index) + '.png')
         # plt.show()
         plt.clf()
@@ -201,20 +200,24 @@ for itrait in range(0, 3):
 # the star is unpacking the sublist to make a flat list
 trait_loss_df = [[ele[0], *ele[1]] for ele in trait_loss]
 trait_loss_df = pd.DataFrame(trait_loss_df,
-                columns=['trait_id', 'chunk_0', 'chunk_1', 'chunk_2'])
-trait_loss_df.to_csv('../ModelMetaData_Prediction/Net_3_CNN_Chunk/'
-                     'Net_3_CNN_Chunk_Result/Net_3_CNN_Chunk_loss.csv')
+                columns=['trait_id', 'chunk_0', 'chunk_1', 'chunk_2',
+                         'chunk_3', 'chunk_4', 'chunk_5', 'chunk_6',
+                         'chunk_7', 'chunk_8'])
+trait_loss_df.to_csv('../ModelMetaData_Prediction/Net_1_CNN_Chunk/'
+                     'Net_1_CNN_Chunk_Result/Net_1_CNN_Chunk_loss.csv')
 
 # the star is unpacking the sublist to make a flat list
 trait_corr_df = [[ele[0], *ele[1]] for ele in trait_corr]
 trait_corr_df = pd.DataFrame(trait_corr_df,
-                columns=['trait_id', 'chunk_0', 'chunk_1', 'chunk_2'])
-trait_corr_df.to_csv('../ModelMetaData_Prediction/Net_3_CNN_Chunk/'
-                     'Net_3_CNN_Chunk_Result/Net_3_CNN_Chunk_cor.csv')
+                     columns=['trait_id', 'chunk_0', 'chunk_1', 'chunk_2',
+                              'chunk_3', 'chunk_4', 'chunk_5', 'chunk_6',
+                              'chunk_7', 'chunk_8'])
+trait_corr_df.to_csv('../ModelMetaData_Prediction/Net_1_CNN_Chunk/'
+                     'Net_1_CNN_Chunk_Result/Net_1_CNN_Chunk_cor.csv')
 
-pathlib.Path("../ModelMetaData_Prediction/Net_3_CNN_Chunk/Net_3_CNN_Chunk_Time/"
-             "Net_3_CNN_Chunk_Training_Time.txt"). \
-    write_text("Net_3_CNN_Chunk_Training_Time: {}"
+pathlib.Path("../ModelMetaData_Prediction/Net_1_CNN_Chunk/Net_1_CNN_Chunk_Time/"
+             "Net_1_CNN_Chunk_Training_Time.txt"). \
+    write_text("Net_1_CNN_Chunk_Training_Time: {}"
                .format(time.time() - start_time))
 
 print("Trait Loss: ", trait_loss_df)

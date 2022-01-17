@@ -43,7 +43,7 @@ Y = Y.dropna()
 Y.columns = np.arange(0, len(Y.columns))
 print("Y shape", Y.shape)
 
-X = pd.read_csv('../Data_Prediction/Soybean_X_C3.csv', index_col=0,
+X = pd.read_csv('../Data_Prediction/Compress_3_Chunk/Soybean_X_C3_0.csv', index_col=0,
                 low_memory=False)
 X = X.T
 X.columns = np.arange(0, len(X.columns))
@@ -68,24 +68,24 @@ X2_valid = np.expand_dims(X_valid, axis=2)
 
 def create_model(loss, learning_rate):
     nSNP = X_train.shape[1]
-    nStride = 3  # stride between convolutions
+    nStride = 2  # stride between convolutions
 
     # Instantiate
     model_cnn = Sequential()
     # add convolutional layer
-    model_cnn.add(Conv1D(32, kernel_size=3, strides=nStride, input_shape=(nSNP, 1)))
+    model_cnn.add(Conv1D(32, nStride, activation="relu", input_shape=(nSNP, 1)))
     model_cnn.add(LeakyReLU(alpha=0.1))
     model_cnn.add(Dropout(0.5))
     # add pooling layer: takes maximum of two consecutive values
     model_cnn.add(MaxPooling1D(pool_size=2))
     # add convolutional layer
-    model_cnn.add(Conv1D(64, kernel_size=3, strides=nStride))
+    model_cnn.add(Conv1D(64, nStride, activation="relu"))
     model_cnn.add(LeakyReLU(alpha=0.1))
     model_cnn.add(Dropout(0.5))
     # add pooling layer: takes maximum of two consecutive values
     model_cnn.add(MaxPooling1D(pool_size=2))
     # add convolutional layer
-    model_cnn.add(Conv1D(128, kernel_size=3, strides=nStride))
+    model_cnn.add(Conv1D(128, nStride, activation="relu"))
     model_cnn.add(LeakyReLU(alpha=0.1))
     model_cnn.add(Dropout(0.5))
     # add pooling layer: takes maximum of two consecutive values
@@ -93,7 +93,7 @@ def create_model(loss, learning_rate):
 
     # Solutions above are linearized to accommodate a standard layer
     model_cnn.add(Flatten())
-    model_cnn.add(Dense(128, activation='linear'))
+    model_cnn.add(Dense(64, activation='linear'))
     model_cnn.add(LeakyReLU(alpha=0.1))
     model_cnn.add(Dense(1))
 
